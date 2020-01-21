@@ -1,0 +1,30 @@
+{
+    "version": 1,
+    "features": [
+        {
+            "name": "test-fiftypercent",
+            "description": "",
+            "enabled": true,
+            "strategies": [
+                {
+                    "name": "gradualRolloutUserId",
+                    "parameters": {
+                        "groupId": "default",
+                        "percentage": "50"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "test",
+            "description": "Test feature flag for development purposes",
+            "enabled": true,
+            "strategies": [
+                {
+                    "name": "default",
+                    "parameters": {}
+                }
+            ]
+        }
+    ]
+}
