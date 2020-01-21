@@ -1,0 +1,59 @@
+{
+  "name": "minds/unleash-client-php",
+  "type": "library",
+  "description": "PHP client for Unleash",
+  "keywords": [
+    "unleash",
+    "client",
+    "minds"
+  ],
+  "homepage": "https://gitlab.com/minds/unleash-client-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brian Hatchet",
+      "email": "brian@minds.com",
+      "homepage": "http://www.minds.com/brianhatchet",
+      "role": "Developer"
+    },
+    {
+      "name": "Emiliano Balbuena",
+      "email": "emiliano@minds.com",
+      "homepage": "http://www.minds.com/edgebal",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "config": {
+    "bin-dir": "bin"
+  },
+  "require": {
+    "php": ">=7.3",
+    "guzzlehttp/guzzle": "^6.3@dev",
+    "monolog/monolog": "^1.25.2",
+    "psr/simple-cache": "^1.0@dev",
+    "zendframework/zend-cache": "^2.9@dev",
+    "zendframework/zend-serializer": "^2.9@dev",
+    "lastguest/murmurhash": "dev-master"
+  },
+  "require-dev": {
+    "bossa/phpspec2-expect": "^3.0",
+    "phpspec/phpspec": "^4.0",
+    "phpspec/prophecy": "~1.0",
+    "friendsofphp/php-cs-fixer": "^2.17@dev"
+  },
+  "autoload": {
+    "files": [
+      "src/Client.php",
+      "src/Unleash.php"
+    ],
+    "psr-4": {
+      "Minds\\UnleashClient\\": "src/",
+      "Minds\\UnleashClient\\Entities\\": "src/Entities/",
+      "Minds\\UnleashClient\\Cache\\": "src/Cache/"
+    }
+  },
+  "scripts": {
+    "test": "phpspec run"
+  }
+}

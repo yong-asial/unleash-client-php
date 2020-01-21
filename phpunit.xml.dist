@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="./vendor/autoload.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="Minds Unleash Client for php">
+            <directory>./test/</directory>
+        </testsuite>
+    </testsuites>
+
+    <groups>
+        <exclude>
+            <group>disable</group>
+        </exclude>
+    </groups>
+
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <env name="UNLEASH_API_URL" value="test_url" />
+        <env name="UNLEASH_INSTANCE_ID" value="test_instance_id"/>
+        <env name="UNLEASH_APPLICATION_NAME" value="test_application_name"/>
+    </php>
+</phpunit>
