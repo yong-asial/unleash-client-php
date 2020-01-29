@@ -2,7 +2,7 @@
 
 namespace spec\Minds\UnleashClient;
 
-use Minds\UnleashClient\Config;
+use Minds\UnleashClient\Http\Config;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -47,10 +47,5 @@ class ConfigSpec extends ObjectBehavior
         $this->getApplicationName()->shouldEqual($applicationName);
         $this->getPollingIntervalSeconds()->shouldEqual($pollingIntervalSeconds);
         $this->getMetricsIntervalSeconds()->shouldEqual($metricsIntervalSeconds);
-    }
-
-    public function it_should_return_a_version()
-    {
-        $this->getVersion()->shouldEqual(Config::VERSION);
     }
 }

@@ -7,8 +7,9 @@
 
 namespace Minds\UnleashClient\Factories;
 
-use Exception;
 use Minds\UnleashClient\Entities\Feature;
+use Minds\UnleashClient\Exceptions\InvalidFeatureNameException;
+use Minds\UnleashClient\Exceptions\InvalidStrategyImplementationException;
 
 /**
  * Factory class to make Feature instantiation testable
@@ -33,10 +34,15 @@ class FeatureFactory
      * Creates a new Feature instance
      * @param array $data
      * @return Feature
-     * @throws Exception
+     * @throws InvalidFeatureNameException
+     * @throws InvalidStrategyImplementationException
      */
     public function build(array $data)
     {
+        if (!isset($data['name']) || !$data['name']) {
+            throw new InvalidFeatureNameException();
+        }
+
         $feature = new Feature();
 
         $strategies = [];

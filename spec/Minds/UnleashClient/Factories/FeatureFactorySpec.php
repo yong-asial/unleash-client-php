@@ -4,6 +4,7 @@ namespace spec\Minds\UnleashClient\Factories;
 
 use Minds\UnleashClient\Entities\Feature;
 use Minds\UnleashClient\Entities\Strategy;
+use Minds\UnleashClient\Exceptions\InvalidFeatureNameException;
 use Minds\UnleashClient\Factories\FeatureFactory;
 use Minds\UnleashClient\Factories\StrategyFactory;
 use PhpSpec\Exception\Example\FailureException;
@@ -58,6 +59,17 @@ class FeatureFactorySpec extends ObjectBehavior
                     $strategy1,
                     $strategy2
                 ]
+            ]);
+    }
+
+    public function it_should_throw_if_no_name_during_build()
+    {
+        $this
+            ->shouldThrow(InvalidFeatureNameException::class)
+            ->duringBuild([
+                'description' => 'a phpspec feature',
+                'enabled' => true,
+                'strategies' => []
             ]);
     }
 
