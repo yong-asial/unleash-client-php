@@ -2,19 +2,17 @@
 
 namespace spec\Minds\UnleashClient;
 
-use Exception;
-use Minds\UnleashClient\Client;
-use Minds\UnleashClient\Config;
 use Minds\UnleashClient\Entities\Context;
 use Minds\UnleashClient\Entities\Feature;
 use Minds\UnleashClient\Entities\Strategy;
+use Minds\UnleashClient\Exceptions\InvalidFeaturesArrayException;
+use Minds\UnleashClient\Exceptions\NoContextException;
 use Minds\UnleashClient\Repository;
 use Minds\UnleashClient\StrategyResolver;
 use Minds\UnleashClient\Unleash;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
 
 class UnleashSpec extends ObjectBehavior
 {
@@ -28,24 +26,15 @@ class UnleashSpec extends ObjectBehavior
     protected $repository;
 
     public function let(
-        Config $config,
         LoggerInterface $logger,
-        StrategyResolver $strategyResolver,
-        CacheInterface $cache,
-        Client $client,
-        Repository $repository
+        StrategyResolver $strategyResolver
     ) {
         $this->logger = $logger;
         $this->strategyResolver = $strategyResolver;
-        $this->repository = $repository;
 
         $this->beConstructedWith(
-            $config,
             $logger,
             $strategyResolver,
-            $cache,
-            $client,
-            $repository
         );
     }
 
@@ -59,12 +48,6 @@ class UnleashSpec extends ObjectBehavior
         Feature $feature1,
         Strategy $strategy1
     ) {
-        $this->repository->getList()
-            ->shouldBeCalled()
-            ->willReturn([
-                'feature1' => $feature1
-            ]);
-
         $feature1->isEnabled()
             ->shouldBeCalled()
             ->willReturn(true);
@@ -78,6 +61,9 @@ class UnleashSpec extends ObjectBehavior
             ->willReturn(true);
 
         $this
+            ->setFeatures([
+                'feature1' => $feature1
+            ])
             ->setContext($context)
             ->isEnabled('feature1', false)
             ->shouldReturn(true);
@@ -87,29 +73,33 @@ class UnleashSpec extends ObjectBehavior
         Context $context,
         Feature $feature1
     ) {
-        $this->repository->getList()
-            ->shouldBeCalled()
-            ->willReturn([
-                'feature1' => $feature1
-            ]);
-
         $this
+            ->setFeatures([
+                'feature1' => $feature1
+            ])
             ->setContext($context)
             ->isEnabled('feature2', false)
             ->shouldReturn(false);
     }
 
-    public function it_should_return_false_if_throws_during_is_enabled(
+    public function it_should_throw_during_is_enabled_if_no_features_set(
         Context $context
     ) {
-        $this->repository->getList()
-            ->shouldBeCalled()
-            ->willThrow(new Exception());
-
         $this
             ->setContext($context)
-            ->isEnabled('feature1', false)
-            ->shouldReturn(false);
+            ->shouldThrow(InvalidFeaturesArrayException::class)
+            ->duringIsEnabled('feature1', false);
+    }
+
+    public function it_should_throw_during_is_enabled_if_no_context_set(
+        Feature $feature1
+    ) {
+        $this
+            ->setFeatures([
+                'feature1' => $feature1
+            ])
+            ->shouldThrow(NoContextException::class)
+            ->duringIsEnabled('feature1', false);
     }
 
     public function it_should_export(
@@ -119,13 +109,6 @@ class UnleashSpec extends ObjectBehavior
         Strategy $strategy1,
         Strategy $strategy2
     ) {
-        $this->repository->getList()
-            ->shouldBeCalled()
-            ->willReturn([
-                'feature1' => $feature1,
-                'feature2' => $feature2,
-            ]);
-
         $feature1->isEnabled()
             ->shouldBeCalled()
             ->willReturn(true);
@@ -151,6 +134,10 @@ class UnleashSpec extends ObjectBehavior
             ->willReturn(false);
 
         $this
+            ->setFeatures([
+                'feature1' => $feature1,
+                'feature2' => $feature2,
+            ])
             ->setContext($context)
             ->export()
             ->shouldReturn([
@@ -159,16 +146,23 @@ class UnleashSpec extends ObjectBehavior
             ]);
     }
 
-    public function it_should_return_empty_if_throws_during_export(
+    public function it_should_throw_during_export_if_no_features_set(
         Context $context
     ) {
-        $this->repository->getList()
-            ->shouldBeCalled()
-            ->willThrow(new Exception());
-
         $this
             ->setContext($context)
-            ->export()
-            ->shouldReturn([]);
+            ->shouldThrow(InvalidFeaturesArrayException::class)
+            ->duringExport();
+    }
+
+    public function it_should_throw_during_export_if_no_context_set(
+        Feature $feature1
+    ) {
+        $this
+            ->setFeatures([
+                'feature1' => $feature1
+            ])
+            ->shouldThrow(NoContextException::class)
+            ->duringExport();
     }
 }

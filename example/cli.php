@@ -1,7 +1,9 @@
 <?php
 require('vendor/autoload.php');
 
-use Minds\UnleashClient\Config;
+use Minds\UnleashClient\Factories\FeatureArrayFactory;
+use Minds\UnleashClient\Http\Client;
+use Minds\UnleashClient\Http\Config;
 use Minds\UnleashClient\Entities\Context;
 use Minds\UnleashClient\Logger;
 use Minds\UnleashClient\Unleash;
@@ -9,7 +11,7 @@ use Minds\UnleashClient\Unleash;
 function main() : void
 {
     $logger = new Logger();
-    $logger->debug('Unleash client demo');
+    $logger->info('Unleash client demo');
 
     $config = new Config(
         "https://gitlab.com/api/v4/feature_flags/unleash/14894840/",
@@ -19,6 +21,20 @@ function main() : void
         15
     );
 
+    $logger->info('Setting up HTTP Client');
+
+    $client = new Client($config, $logger);
+    $client->register();
+
+    $logger->info('Client ID: ' . $client->getId());
+
+    $features = (new FeatureArrayFactory())->build(
+        $client
+            ->fetch()
+    );
+
+    $logger->info('Setting up demo context');
+
     $context = new Context();
     $context
         ->setUserId('1000')
@@ -27,8 +43,11 @@ function main() : void
         ->setRemoteAddress('127.0.0.1')
         ->setHostName('www.minds.com');
 
-    $unleash = new Unleash($config, $logger);
+    $logger->info('Setting up Unleash resolver');
+
+    $unleash = new Unleash($logger);
     $unleash
+        ->setFeatures($features)
         ->setContext($context);
 
     $enabled = $unleash->isEnabled('test', false);

@@ -1,8 +1,8 @@
 <?php
-namespace Minds\UnleashClient;
+namespace Minds\UnleashClient\Http;
 
 /**
- * Configuration object for the Unleash client
+ * Configuration object for the HTTP Unleash client
  */
 class Config
 {
@@ -24,9 +24,6 @@ class Config
     /** @var int */
     protected $metricsIntervalSeconds;
 
-    /** @var int */
-    protected $cacheTtl;
-
     /**
      * Config constructor.
      * @param string|null $apiUrl
@@ -47,15 +44,6 @@ class Config
         $this->applicationName = $applicationName ?? '';
         $this->pollingIntervalSeconds = $pollingIntervalSeconds ?? 15;
         $this->metricsIntervalSeconds = $metricsIntervalSeconds ?? 60;
-    }
-
-    /**
-     * Gets the current version number of the library
-     * @return string
-     */
-    public function getVersion(): string
-    {
-        return static::VERSION;
     }
 
     /**

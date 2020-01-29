@@ -2,12 +2,12 @@
 
 namespace Minds\UnleashClient;
 
-use Exception;
 use Minds\UnleashClient\Entities\Context;
 use Minds\UnleashClient\Entities\Feature;
-use Psr\SimpleCache\CacheInterface;
+use Minds\UnleashClient\Exceptions\InvalidFeatureImplementationException;
+use Minds\UnleashClient\Exceptions\InvalidFeaturesArrayException;
+use Minds\UnleashClient\Exceptions\NoContextException;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Unleash integration with a context
@@ -21,40 +21,40 @@ class Unleash
     /** @var StrategyResolver */
     protected $strategyResolver;
 
-    /** @var Repository */
-    protected $repository;
+    /** @var array */
+    protected $features;
 
     /** @var Context */
     protected $context;
 
     /**
      * Unleash constructor.
-     * @param Config|null $config
      * @param LoggerInterface|null $logger
      * @param StrategyResolver|null $strategyResolver
-     * @param CacheInterface|null $cache
-     * @param Client|null $client
-     * @param Repository|null $repository
      */
     public function __construct(
-        Config $config = null,
         LoggerInterface $logger = null,
-        StrategyResolver $strategyResolver = null,
-        CacheInterface $cache = null,
-        Client $client = null,
-        Repository $repository = null
+        StrategyResolver $strategyResolver = null
     ) {
-        $config = $config ?: new Config();
         $this->logger = $logger ?: new Logger();
         $this->strategyResolver = $strategyResolver ?: new StrategyResolver($this->logger);
-        $repository = $repository ?: new Repository(
-            $config,
-            $this->logger,
-            $cache ?: new Cache\SimpleCache($this->logger),
-            $client ?: new Client($config, $this->logger)
-        );
+    }
 
-        $this->repository = $repository;
+    /**
+     * @param array $features
+     * @return Unleash
+     * @throws InvalidFeatureImplementationException
+     */
+    public function setFeatures(array $features): Unleash
+    {
+        foreach ($features as $key => $feature) {
+            if (!($feature instanceof Feature)) {
+                throw new InvalidFeatureImplementationException(sprintf("Strategy should be an instance of %s", Feature::class));
+            }
+        }
+
+        $this->features = $features;
+        return $this;
     }
 
     /**
@@ -70,68 +70,70 @@ class Unleash
 
     /**
      * Resolves a feature flag for the current context
-     * @param string $featureName
+     * @param string $key
      * @param bool $default
      * @return bool
-     * @throws InvalidArgumentException
+     * @throws InvalidFeaturesArrayException
+     * @throws NoContextException
      */
-    public function isEnabled(string $featureName, bool $default = false): bool
+    public function isEnabled(string $key, bool $default = false): bool
     {
-        try {
-            $this->logger->debug("Checking for {$featureName}");
-
-            $features = $this->repository
-                ->getList();
-
-            if (!isset($features[$featureName])) {
-                $this->logger->debug("{$featureName} is not set, returning default");
-                return $default;
-            }
-
-            /** @var Feature $feature */
-            $feature = $features[$featureName];
-
-            return
-                $feature->isEnabled() &&
-                $this->strategyResolver->isEnabled(
-                    $feature->getStrategies(),
-                    $this->context
-                );
-        } catch (Exception $e) {
-            $this->logger->error($e);
-            return false;
+        if (!is_array($this->features)) {
+            throw new InvalidFeaturesArrayException();
         }
+
+        if (!$this->context) {
+            throw new NoContextException();
+        }
+
+        $this->logger->debug("Checking for {$key}");
+
+        if (!isset($this->features[$key])) {
+            $this->logger->debug("{$key} is not set, returning default");
+            return $default;
+        }
+
+        /** @var Feature $feature */
+        $feature = $this->features[$key];
+
+        return
+            $feature->isEnabled() &&
+            $this->strategyResolver->isEnabled(
+                $feature->getStrategies(),
+                $this->context
+            );
     }
 
     /**
      * Resolves and exports the whole set of feature flags for the current context
      * @return array
-     * @throws InvalidArgumentException
+     * @throws InvalidFeaturesArrayException
+     * @throws NoContextException
      */
     public function export(): array
     {
-        try {
-            $this->logger->debug("Exporting all features");
-
-            $features = $this->repository
-                ->getList();
-
-            $export = [];
-
-            foreach ($features as $featureName => $feature) {
-                /** @var Feature $feature */
-                $export[$featureName] =
-                    $feature->isEnabled() &&
-                    $this->strategyResolver->isEnabled(
-                        $feature->getStrategies(),
-                        $this->context
-                    );
-            }
-
-            return $export;
-        } catch (Exception $e) {
-            $this->logger->error($e);
-            return [];
+        if (!is_array($this->features)) {
+            throw new InvalidFeaturesArrayException();
         }
+
+        if (!$this->context) {
+            throw new NoContextException();
+        }
+
+        $this->logger->debug("Exporting all features");
+
+        $export = [];
+
+        foreach ($this->features as $featureName => $feature) {
+            /** @var Feature $feature */
+            $export[$featureName] =
+                $feature->isEnabled() &&
+                $this->strategyResolver->isEnabled(
+                    $feature->getStrategies(),
+                    $this->context
+                );
+        }
+
+        return $export;
     }
 }

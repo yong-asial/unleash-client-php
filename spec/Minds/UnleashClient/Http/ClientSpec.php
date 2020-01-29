@@ -2,8 +2,8 @@
 
 namespace spec\Minds\UnleashClient;
 
-use Minds\UnleashClient\Client;
-use Minds\UnleashClient\Config;
+use Minds\UnleashClient\Http\Client;
+use Minds\UnleashClient\Http\Config;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use GuzzleHttp\Client as HttpClient;
@@ -41,7 +41,6 @@ class ClientSpec extends ObjectBehavior
         $this->config->getInstanceId()->willReturn(ClientSpec::TEST_INSTANCE_ID);
         $this->config->getPollingIntervalSeconds()->willReturn(ClientSpec::TEST_POLLING_INTERVAL_SECONDS);
         $this->config->getMetricsIntervalSeconds()->willReturn(ClientSpec::TEST_METRICS_INTERVAL_SECONDS);
-        $this->config->getVersion()->willReturn(Config::VERSION);
 
         $this->beConstructedWith($this->config, $this->logger, $this->httpClient);
     }
@@ -69,7 +68,7 @@ class ClientSpec extends ObjectBehavior
         $this->register($date);
     }
 
-    public function it_should_get_features(ResponseInterface $response)
+    public function it_should_fetch(ResponseInterface $response)
     {
         $this->httpClient->get('client/features')
             ->shouldBeCalled()
@@ -83,7 +82,7 @@ class ClientSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->getMockData('features.json'));
 
-        $features = $this->getFeatures();
+        $features = $this->fetch();
         $features->shouldHaveCount(2);
     }
 

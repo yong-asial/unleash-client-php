@@ -7,7 +7,7 @@
 
 namespace Minds\UnleashClient\Entities;
 
-use Exception;
+use Minds\UnleashClient\Exceptions\InvalidStrategyImplementationException;
 
 class Feature
 {
@@ -96,13 +96,13 @@ class Feature
      * Sets the feature strategies
      * @param Strategy[] $strategies
      * @return Feature
-     * @throws Exception
+     * @throws InvalidStrategyImplementationException
      */
     public function setStrategies(array $strategies): Feature
     {
         foreach ($strategies as $strategy) {
             if (!($strategy instanceof Strategy)) {
-                throw new Exception(sprintf("Strategy should be an instance of %s", Strategy::class));
+                throw new InvalidStrategyImplementationException(sprintf("Strategy should be an instance of %s", Strategy::class));
             }
         }
 

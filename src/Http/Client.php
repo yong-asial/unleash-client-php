@@ -1,16 +1,19 @@
 <?php
 
-namespace Minds\UnleashClient;
+namespace Minds\UnleashClient\Http;
 
 use Exception;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\MessageFormatter;
+use Minds\UnleashClient\Logger;
+use Minds\UnleashClient\Version;
 use Psr\Log\LoggerInterface;
 
 /**
  * Wraps a Guzzle HTTP client in Unleash specific functions
+ * @package Minds\UnleashClient\Http
  */
 class Client
 {
@@ -20,7 +23,7 @@ class Client
     /** @var Config */
     protected $config;
 
-    /** @var Logger */
+    /** @var LoggerInterface */
     protected $logger;
 
     /** @var string */
@@ -51,7 +54,7 @@ class Client
     public function getId(): string
     {
         if (!$this->id) {
-            $this->generateId();
+            $this->regenerateId();
         }
 
         return $this->id;
@@ -71,14 +74,15 @@ class Client
             $payload = [
                 'appName' => $this->config->getApplicationName(),
                 'instanceId' => $this->config->getInstanceId(),
-                'sdkVersion' => "unleash-client-php:" . $this->config->getVersion(),
+                'sdkVersion' => sprintf("unleash-client-php:%s", Version::get()),
                 'strategies' => [],
                 'started' => $date,
                 'interval' => $this->config->getMetricsIntervalSeconds() * 1000
             ];
+
             $this->logger->debug('Client payload', $payload);
 
-            $this->generateId();
+            $this->regenerateId();
 
             $response = $this->httpClient->post('client/register', $payload);
 
@@ -97,7 +101,7 @@ class Client
      * Else, logs and error and returns an empty array.
      * @return array
      */
-    public function getFeatures(): array
+    public function fetch(): array
     {
         $this->logger->debug('Getting feature flags');
 
@@ -146,13 +150,13 @@ class Client
     /**
      * Generates an ID based on the config values
      */
-    protected function generateId(): void
+    protected function regenerateId(): void
     {
         $this->id = substr(sha1(implode(':', [
             $this->config->getApiUrl(),
             $this->config->getApplicationName(),
             $this->config->getInstanceId(),
-            $this->config->getVersion()
+            Version::get()
         ])), 4, 9);
     }
 }
