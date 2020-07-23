@@ -84,7 +84,9 @@ class Client
 
             $this->regenerateId();
 
-            $response = $this->httpClient->post('client/register', $payload);
+            $response = $this->httpClient->request('POST', 'client/register', [
+                'json' => $payload,
+            ]);
 
             return
                 $response->getStatusCode() >= 200 &&
