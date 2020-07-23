@@ -7,6 +7,7 @@ cache:
   - .composer
 
 before_script:
+- apt-get update && apt-get install -yq unzip
 # Install composer dependencies
 - curl --silent https://composer.github.io/installer.sig | tr -d '\n' > installer.sig
 - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
