@@ -7,11 +7,9 @@ use Minds\UnleashClient\Entities\Feature;
 use Minds\UnleashClient\Entities\Strategy;
 use Minds\UnleashClient\Exceptions\InvalidFeaturesArrayException;
 use Minds\UnleashClient\Exceptions\NoContextException;
-use Minds\UnleashClient\Repository;
 use Minds\UnleashClient\StrategyResolver;
 use Minds\UnleashClient\Unleash;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 class UnleashSpec extends ObjectBehavior
@@ -22,9 +20,6 @@ class UnleashSpec extends ObjectBehavior
     /** @var StrategyResolver */
     protected $strategyResolver;
 
-    /** @var Repository */
-    protected $repository;
-
     public function let(
         LoggerInterface $logger,
         StrategyResolver $strategyResolver
@@ -34,7 +29,7 @@ class UnleashSpec extends ObjectBehavior
 
         $this->beConstructedWith(
             $logger,
-            $strategyResolver,
+            $strategyResolver
         );
     }
 
