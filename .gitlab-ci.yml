@@ -1,8 +1,10 @@
 image: php:7.3
 
+variables:
+  COMPOSER_HOME: .composer
 cache:
   paths:
-  - vendor/
+  - .composer
 
 before_script:
 # Install composer dependencies
