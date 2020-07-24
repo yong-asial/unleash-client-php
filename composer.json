@@ -27,15 +27,15 @@
     "bin-dir": "bin"
   },
   "require": {
-    "php": ">=7.3",
-    "guzzlehttp/guzzle": "^6.3@dev",
+    "php": ">=7.1",
+    "guzzlehttp/guzzle": "^6.3",
     "monolog/monolog": "^1.25.2",
     "lastguest/murmurhash": "^2.0.0",
     "ext-json": "*"
   },
   "require-dev": {
     "bossa/phpspec2-expect": "^3.0",
-    "phpspec/phpspec": "^4.0",
+    "phpspec/phpspec": "^4.0 || ^5.0 || ^6.0",
     "phpspec/prophecy": "~1.0",
     "friendsofphp/php-cs-fixer": "^2.16"
   },

@@ -1,31 +1,62 @@
-image: php:7.3
-
-variables:
-  COMPOSER_HOME: .composer
-cache:
-  paths:
-  - .composer
-
-before_script:
-- apt-get update && apt-get install -yq unzip
-# Install composer dependencies
-- curl --silent https://composer.github.io/installer.sig | tr -d '\n' > installer.sig
-- php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-- php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-- php composer-setup.php
-- php -r "unlink('composer-setup.php'); unlink('installer.sig');"
-- rm -rf vendor
-- php composer.phar install
-
 stages:
   - test
 
+.php-test:
+  variables:
+    COMPOSER_HOME: .composer
+  cache:
+    paths:
+    - .composer
+  before_script:
+  - apt-get update && apt-get install -yq unzip
+  # Install composer dependencies
+  - curl --silent https://composer.github.io/installer.sig | tr -d '\n' > installer.sig
+  - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+  - php composer-setup.php
+  - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
+  - rm -rf vendor
+  - php composer.phar install
+
 lint:
   stage: test
+  extends: .php-test
+  image: php:7.3
   script:
     - bin/php-cs-fixer fix --allow-risky=yes --verbose --dry-run
 
-test:
+test 7.1:
   stage: test
+  image: php:7.1
+  extends: .php-test
   script:
     - php composer.phar test -- -f pretty
+
+test 7.2:
+  stage: test
+  image: php:7.2
+  extends: .php-test
+  script:
+    - php composer.phar test -- -f pretty
+
+test 7.3:
+  stage: test
+  image: php:7.3
+  extends: .php-test
+  script:
+    - php composer.phar test -- -f pretty
+
+test 7.4:
+  stage: test
+  image: php:7.4
+  extends: .php-test
+  script:
+    - php composer.phar test -- -f pretty
+
+#latest phpspec doesn't support 8.0 yet
+#test 8.0:
+#  stage: test
+#  image: php:8.0-rc
+#  extends: .php-test
+#  script:
+#    - php composer.phar test -- -f pretty
