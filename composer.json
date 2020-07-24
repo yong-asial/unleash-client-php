@@ -23,7 +23,6 @@
       "role": "Developer"
     }
   ],
-  "minimum-stability": "dev",
   "config": {
     "bin-dir": "bin"
   },
@@ -31,7 +30,6 @@
     "php": ">=7.3",
     "guzzlehttp/guzzle": "^6.3@dev",
     "monolog/monolog": "^1.25.2",
-    "zendframework/zend-serializer": "^2.9@dev",
     "lastguest/murmurhash": "^2.0.0",
     "ext-json": "*"
   },
@@ -39,20 +37,11 @@
     "bossa/phpspec2-expect": "^3.0",
     "phpspec/phpspec": "^4.0",
     "phpspec/prophecy": "~1.0",
-    "friendsofphp/php-cs-fixer": "^2.17@dev"
+    "friendsofphp/php-cs-fixer": "^2.16"
   },
   "autoload": {
-    "files": [
-      "src/Unleash.php"
-    ],
     "psr-4": {
-      "Minds\\UnleashClient\\": "src/",
-      "Minds\\UnleashClient\\Entities\\": "src/Entities/",
-      "Minds\\UnleashClient\\Exceptions\\": "src/Exceptions/",
-      "Minds\\UnleashClient\\Factories\\": "src/Factories/",
-      "Minds\\UnleashClient\\Helpers\\": "src/Helpers/",
-      "Minds\\UnleashClient\\Http\\": "src/Http/",
-      "Minds\\UnleashClient\\StrategyAlgorithms\\": "src/StrategyAlgorithms/"
+      "Minds\\UnleashClient\\": "src/"
     }
   },
   "scripts": {
