@@ -1,5 +1,5 @@
 {
-  "name": "minds/unleash-client-php",
+  "name": "yong-asial/unleash-client-php",
   "type": "library",
   "description": "PHP client for Unleash",
   "keywords": [
@@ -7,7 +7,7 @@
     "client",
     "minds"
   ],
-  "homepage": "https://gitlab.com/minds/unleash-client-php",
+  "homepage": "https://github.com/yong-asial/unleash-client-php",
   "license": "MIT",
   "authors": [
     {
